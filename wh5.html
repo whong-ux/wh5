@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2016-2025 台灣、日本、韓國入境旅客人次統計圖表</title>
+  <!-- Tailwind CSS CDN for styling -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Highcharts core & export modules with reliable CDN & defer handling -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/11.4.0/highcharts.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/11.4.0/modules/series-label.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/11.4.0/modules/exporting.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/11.4.0/modules/export-data.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/11.4.0/modules/accessibility.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
+    body {
+      font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col p-4 md:p-8">
+
+  <!-- Header Section -->
+  <header class="max-w-6xl w-full mx-auto mb-6 text-center">
+    <div class="inline-flex items-center gap-2 px-3 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-semibold rounded-full mb-3">
+      <span>官方統計數據視覺化</span> • <span>2016 – 2025</span>
+    </div>
+    <h1 class="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">
+      台灣、日本、韓國 歷年入境旅客人次趨勢圖
+    </h1>
+    <p class="text-slate-500 text-sm mt-1">
+      資料來源：台灣交通部觀光署 (MOTC)・日本政府觀光局 (JNTO)・韓國觀光公社 (KTO)
+    </p>
+  </header>
+
+  <!-- Interactive Controls Bar -->
+  <section class="max-w-6xl w-full mx-auto mb-4 flex flex-wrap items-center justify-between gap-3 bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+    <div class="flex items-center gap-2">
+      <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">視圖控制：</span>
+      <button id="btn-toggle-labels" class="px-3 py-1.5 text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors">
+        切換數值標籤
+      </button>
+      <button id="btn-log-scale" class="px-3 py-1.5 text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors">
+        對數 / 線性刻度
+      </button>
+    </div>
+    <div class="text-xs text-slate-400">
+      * 支援縮放、右上方功能表匯出圖片 (PNG/PDF/SVG)
+    </div>
+  </section>
+
+  <!-- Chart Container Card -->
+  <main class="max-w-6xl w-full mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 p-4 md:p-6 mb-8 flex-1">
+    <div id="chart-container" class="w-full h-[520px]"></div>
+    <div id="loading-state" class="text-center py-20 text-slate-400 text-sm hidden">
+      <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mb-2"></div>
+      <p>正在載入圖表模組...</p>
+    </div>
+  </main>
+
+  <!-- Analytical Report Section (Accordion Interface) -->
+  <section class="max-w-6xl w-full mx-auto mb-10">
+    <div class="flex items-center justify-between mb-4 px-1">
+      <div>
+        <h2 class="text-xl md:text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+          <svg class="w-6 h-6 text-indigo-600 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+          </svg>
+          十年跨境觀光消長深度專題研析 (2016–2025)
+        </h2>
+        <p class="text-xs text-slate-500 mt-0.5">點擊各分類區塊以展開或收合詳細評析與趨勢探討</p>
+      </div>
+      <div class="flex gap-2">
+        <button id="btn-expand-all" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium px-2.5 py-1 rounded bg-indigo-50 hover:bg-indigo-100 transition-colors">
+          全部展開
+        </button>
+        <button id="btn-collapse-all" class="text-xs text-slate-600 hover:text-slate-800 font-medium px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 transition-colors">
+          全部收合
+        </button>
+      </div>
+    </div>
+
+    <!-- Accordion Wrapper -->
+    <div class="space-y-3" id="report-accordion">
+
+      <!-- Accordion Item 1 -->
+      <div class="border border-slate-200 bg-white rounded-xl overflow-hidden shadow-sm transition-all duration-200">
+        <button class="accordion-header w-full flex items-center justify-between p-4 md:p-5 text-left bg-white hover:bg-slate-50/80 transition-colors focus:outline-none" aria-expanded="true">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm shrink-0">
+              01
+            </span>
+            <div>
+              <h3 class="text-base md:text-lg font-bold text-slate-800">
+                前言與總體走勢：從百家爭鳴、深淵谷底到結構性分流
+              </h3>
+              <p class="text-xs text-slate-500 mt-0.5">2016–2025 東亞三強入境觀光規模演變綜述</p>
+            </div>
+          </div>
+          <svg class="chevron-icon w-5 h-5 text-slate-400 transition-transform duration-300 transform rotate-180 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </button>
+        <div class="accordion-content px-5 pb-5 pt-1 text-slate-700 text-sm leading-relaxed border-t border-slate-100">
+          <p class="mb-3">
+            過去十年（2016–2025 年）是全球暨東亞觀光旅遊史上波動最劇烈、洗牌最顯著的關鍵十年。台灣、日本與韓國身處地緣鄰近、互為客源輸出與輸入國的三角關係，在經歷 2016 至 2019 年的黃金增長期後，遭遇 2020 至 2022 年 COVID-19 世紀大疫重挫；而在 2023 年以降的疫後大復甦中，三國卻呈現出截然不同的成長斜率與韌性差距。
+          </p>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 my-3">
+            <div class="p-3 bg-blue-50/60 rounded-lg border border-blue-100">
+              <span class="text-xs font-bold text-blue-700 block mb-1">台灣：溫和修復與結構考驗</span>
+              <p class="text-xs text-slate-600">從 2019 峰值 1,186 萬人跌至 2021 谷底 14 萬人，2025 年回升至 857 萬人（恢復率約 72.3%），受制於兩岸政策僵局與國旅結構重塑。</p>
+            </div>
+            <div class="p-3 bg-red-50/60 rounded-lg border border-red-100">
+              <span class="text-xs font-bold text-red-700 block mb-1">日本：匯率紅利帶動爆發翻倍</span>
+              <p class="text-xs text-slate-600">2019 年 3,188 萬人曾為當時歷史紀錄，疫後在日圓歷史性貶值與多元文化輸出推波助瀾下，2025 年創下 4,268 萬人次歷史新高（增幅達 133.9%）。</p>
+            </div>
+            <div class="p-3 bg-purple-50/60 rounded-lg border border-purple-100">
+              <span class="text-xs font-bold text-purple-700 block mb-1">韓國：K-Culture 賦能超越前高</span>
+              <p class="text-xs text-slate-600">歷經 2017 薩德風暴重挫後重組客源，2025 年達到 1,894 萬人次，以韓流軟實力與高附加價值旅遊產品成功突破 2019 峰值。</p>
+            </div>
+          </div>
+          <p class="text-xs text-slate-500">
+            十年總體曲線顯示：疫情造成了各國觀光基礎設施的短暫重設，但疫後決定復甦強度的決定性關鍵已非「地理距離」，而是「幣值購買力優勢」、「文化內容吸引力」及「國際客源結構是否足夠多元化」。
+          </p>
+        </div>
+      </div>
+
+      <!-- Accordion Item 2 -->
+      <div class="border border-slate-200 bg-white rounded-xl overflow-hidden shadow-sm transition-all duration-200">
+        <button class="accordion-header w-full flex items-center justify-between p-4 md:p-5 text-left bg-white hover:bg-slate-50/80 transition-colors focus:outline-none" aria-expanded="false">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm shrink-0">
+              02
+            </span>
+            <div>
+              <h3 class="text-base md:text-lg font-bold text-slate-800">
+                第一階段：2016–2019 盛世高峰與客源地緣政治考驗
+              </h3>
+              <p class="text-xs text-slate-500 mt-0.5">陸客市場變局、日本觀光立國成效與各國策略佈局</p>
+            </div>
+          </div>
+          <svg class="chevron-icon w-5 h-5 text-slate-400 transition-transform duration-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </button>
+        <div class="accordion-content px-5 pb-5 pt-1 text-slate-700 text-sm leading-relaxed border-t border-slate-100 hidden">
+          <p class="mb-3">
+            2016 至 2019 年間，亞洲廉價航空普及、中產階級休閒需求激增，東亞觀光步入繁榮期。然而此時期亦深刻體現了地緣政治對跨境旅客流量的巨大撼動：
+          </p>
+          <ul class="list-disc pl-5 space-y-2 text-xs md:text-sm text-slate-600 mb-3">
+            <li>
+              <strong class="text-slate-800">韓國的「薩德震撼」與客源分散：</strong> 2016 年韓國入境旅客達 1,724 萬人高峰；2017 年因部署薩德反導系統引發中國「限韓令」，陸客團斷崖式下跌，導致 2017 年韓國入境人次陡降至 1,334 萬人（跌幅達 22.6%）。此事件促使韓國觀光公社迅速啟動東南亞、歐美與穆斯林市場拓展，至 2019 年成功重返 1,750 萬人的歷史高峰。
+            </li>
+            <li>
+              <strong class="text-slate-800">日本的「觀光立國政策」大獲全勝：</strong> 2012 年底安倍晉三上任後推動放寬觀光簽證、擴大免稅品項與地方文旅活化。日本訪客人次由 2016 年的 2,404 萬一路狂飆至 2019 年的 3,188 萬人次，成為亞洲觀光產業擴張最迅猛的火車頭。
+            </li>
+            <li>
+              <strong class="text-slate-800">台灣的新南向政策與千萬門檻保衛：</strong> 2016 年起兩岸關係趨冷，陸客人數自歷史高位銳減。台灣透過推動「新南向政策」免簽與宣傳，成功以泰國、越南、菲律賓等東南亞客源及日韓旅客補足缺口，2019 年寫下 1,186 萬人次的歷史最高紀錄。
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Accordion Item 3 -->
+      <div class="border border-slate-200 bg-white rounded-xl overflow-hidden shadow-sm transition-all duration-200">
+        <button class="accordion-header w-full flex items-center justify-between p-4 md:p-5 text-left bg-white hover:bg-slate-50/80 transition-colors focus:outline-none" aria-expanded="false">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm shrink-0">
+              03
+            </span>
+            <div>
+              <h3 class="text-base md:text-lg font-bold text-slate-800">
+                第二階段：2020–2022 疫情深淵與零旅客衝擊
+              </h3>
+              <p class="text-xs text-slate-500 mt-0.5">世紀大疫席捲、邊境鎖國政策與產業體質冬眠</p>
+            </div>
+          </div>
+          <svg class="chevron-icon w-5 h-5 text-slate-400 transition-transform duration-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </button>
+        <div class="accordion-content px-5 pb-5 pt-1 text-slate-700 text-sm leading-relaxed border-t border-slate-100 hidden">
+          <p class="mb-3">
+            2020 年初 COVID-19 爆發，全球各國陸續祭出國境封鎖與嚴格防疫隔離政策，國際航空網絡幾乎中斷，觀光業陷入「急凍期」：
+          </p>
+          <div class="overflow-x-auto my-3">
+            <table class="w-full text-xs text-left border-collapse border border-slate-200">
+              <thead>
+                <tr class="bg-slate-100 text-slate-700">
+                  <th class="p-2 border border-slate-200">國家 / 地區</th>
+                  <th class="p-2 border border-slate-200 text-right">2019 峰值</th>
+                  <th class="p-2 border border-slate-200 text-right">2021 谷底人次</th>
+                  <th class="p-2 border border-slate-200 text-right">最大跌幅</th>
+                  <th class="p-2 border border-slate-200">關鍵邊境政策與狀態</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="border-b border-slate-100">
+                  <td class="p-2 font-semibold">台灣</td>
+                  <td class="p-2 text-right">1,186 萬</td>
+                  <td class="p-2 text-right font-semibold text-red-600">14.0 萬</td>
+                  <td class="p-2 text-right text-red-600">-98.8%</td>
+                  <td class="p-2 text-slate-600">維持全球最嚴謹的「14+7」邊境隔離，直至 2022 年 10 月 13 日方全面實施「0+7」免隔離。</td>
+                </tr>
+                <tr class="border-b border-slate-100">
+                  <td class="p-2 font-semibold">日本</td>
+                  <td class="p-2 text-right">3,188 萬</td>
+                  <td class="p-2 text-right font-semibold text-red-600">24.6 萬</td>
+                  <td class="p-2 text-right text-red-600">-99.2%</td>
+                  <td class="p-2 text-slate-600">鎖國長達兩年，東京奧運以無觀眾模式舉行，直至 2022 年 10 月恢復免簽證自由行。</td>
+                </tr>
+                <tr>
+                  <td class="p-2 font-semibold">韓國</td>
+                  <td class="p-2 text-right">1,750 萬</td>
+                  <td class="p-2 text-right font-semibold text-red-600">96.7 萬</td>
+                  <td class="p-2 text-right text-red-600">-94.5%</td>
+                  <td class="p-2 text-slate-600">疫情期間仍有部分商務與留學流動，2022 年中率先放寬隔離要求，重啟國際客源。</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="text-xs text-slate-600">
+            三國在 2021 年皆跌入統計以來的絕對谷底。此階段導致了航空運能縮減、地勤地勤流失、飯店人員轉職等結構性人力荒，也為 2023 年解封初期各地面臨的「承載力瓶頸」埋下伏筆。
+          </p>
+        </div>
+      </div>
+
+      <!-- Accordion Item 4 -->
+      <div class="border border-slate-200 bg-white rounded-xl overflow-hidden shadow-sm transition-all duration-200">
+        <button class="accordion-header w-full flex items-center justify-between p-4 md:p-5 text-left bg-white hover:bg-slate-50/80 transition-colors focus:outline-none" aria-expanded="false">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm shrink-0">
+              04
+            </span>
+            <div>
+              <h3 class="text-base md:text-lg font-bold text-slate-800">
+                第三階段：2023–2025 報復性反彈與大分流時代
+              </h3>
+              <p class="text-xs text-slate-500 mt-0.5">日圓超級貶值效應、K-Culture 出圈與台灣復甦瓶頸深度解析</p>
+            </div>
+          </div>
+          <svg class="chevron-icon w-5 h-5 text-slate-400 transition-transform duration-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </button>
+        <div class="accordion-content px-5 pb-5 pt-1 text-slate-700 text-sm leading-relaxed border-t border-slate-100 hidden">
+          <p class="mb-3">
+            2023 年至 2025 年迎來各國國境全面開放後的國際觀光大浪潮。然而，數據展現出極具啟發性的「強弱分流」現象：
+          </p>
+          <div class="space-y-3 text-xs md:text-sm text-slate-600">
+            <div class="p-3 bg-slate-50 rounded-lg">
+              <strong class="text-slate-900 block mb-1">1. 日本：外幣購買力槓桿與全球觀光吸磁</strong>
+              日圓兌美元與東亞各幣別在 2023–2025 年間維持長達數年的弱勢格局，使日本成為全球性價比最高的旅遊目的地之一。日本入境人次在 2023 年即修復至 2,507 萬人，2024 年衝上 3,687 萬人打破歷史紀錄，2025 年更跨越 4,268 萬人大關，甚至帶動了京都、富士山周邊等地的「觀光公害（Overtourism）」防範法案。
+            </div>
+            <div class="p-3 bg-slate-50 rounded-lg">
+              <strong class="text-slate-900 block mb-1">2. 韓國：影視、音樂與高端醫療觀光的全面融合</strong>
+              韓國憑藉 Netflix 韓劇、K-POP 偶像文化與高黏著度的美妝、醫美旅遊，在歐美與東南亞年輕客群中迅速扎根。2024 年達 1,637 萬人次，2025 年突破 1,894 萬人次，順利超越 2019 年的高峰水準。
+            </div>
+            <div class="p-3 bg-slate-50 rounded-lg">
+              <strong class="text-slate-900 block mb-1">3. 台灣：入境逆差擴大與「千萬門檻」結構性挑戰</strong>
+              台灣 2023 年入境約 649 萬人次，2024 年為 786 萬人次，2025 年達 857 萬人次。雖然呈現穩健上升，但相較於日韓已「完全超車 2019」，台灣復甦步伐相對落後，主要核心因素包括：
+              <ul class="list-disc pl-5 mt-1 space-y-1">
+                <li><strong>兩岸觀光政治僵局</strong>：疫情前佔比近四分之一的大陸團客與自由行市場未獲全面解凍。</li>
+                <li><strong>高觀光逆差與日圓排擠</strong>：台灣國人出境熱潮集中於日本（2024–2025 年赴日人次屢創新高），而日韓旅客來台意願受到台幣相對日圓強勢的物價考驗。</li>
+                <li><strong>性價比與國際行銷品牌定錨</strong>：台灣國內旅宿平日高昂房價與缺乏國際級長程度假誘因，致使在爭取歐美長程客群上增長空間受限。</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Accordion Item 5 -->
+      <div class="border border-slate-200 bg-white rounded-xl overflow-hidden shadow-sm transition-all duration-200">
+        <button class="accordion-header w-full flex items-center justify-between p-4 md:p-5 text-left bg-white hover:bg-slate-50/80 transition-colors focus:outline-none" aria-expanded="false">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-sm shrink-0">
+              05
+            </span>
+            <div>
+              <h3 class="text-base md:text-lg font-bold text-slate-800">
+                十年啟示錄：給台灣觀光發展策略的四大省思
+              </h3>
+              <p class="text-xs text-slate-500 mt-0.5">從單純衝刺人次轉向價值深化、體驗經濟與永續治理</p>
+            </div>
+          </div>
+          <svg class="chevron-icon w-5 h-5 text-slate-400 transition-transform duration-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </button>
+        <div class="accordion-content px-5 pb-5 pt-1 text-slate-700 text-sm leading-relaxed border-t border-slate-100 hidden">
+          <p class="mb-3">
+            檢視這十年的數據變化，觀光人次的消長不僅是冰冷的數字統計，更揭示了國家總體品牌力、經濟基本面與旅遊戰略的連鎖反應。未來台灣觀光政策在課堂與實務探討上，值得聚焦以下四大層面：
+          </p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs md:text-sm">
+            <div class="border border-slate-200 p-3 rounded-lg">
+              <span class="font-bold text-slate-900 block mb-1 text-indigo-600">一、擺脫單一客源依賴的韌性考驗</span>
+              <p class="text-slate-600">
+                韓國經歷 2017 陸客雪崩後成功重組客源，證明「客源多元化」是抵禦地緣政治震盪的唯一解方。台灣須進一步深耕北美、歐洲、澳洲等高附加價值客群，避免將復甦期待過度繫於不可控的政治協商。
+              </p>
+            </div>
+            <div class="border border-slate-200 p-3 rounded-lg">
+              <span class="font-bold text-slate-900 block mb-1 text-indigo-600">二、從「人次衝刺」轉向「觀光產值與停留天數」</span>
+              <p class="text-slate-600">
+                日本在 2024–2025 年已不再盲目追求人次無限增長，而是將重心轉向「每人平均消費額」與「分散至二三線城市」。台灣島內空間與觀光承載力有限，應將 KPI 由單純「破千萬人」轉型為「人均消費額」與「綠色永續指標」。
+              </p>
+            </div>
+            <div class="border border-slate-200 p-3 rounded-lg">
+              <span class="font-bold text-slate-900 block mb-1 text-indigo-600">三、國家文化品牌與獨特性體驗</span>
+              <p class="text-slate-600">
+                日本以動漫、鐵道、傳統工藝與精緻美食打造了強大世界觀；韓國以潮流娛樂、影視 IP 帶動無痛文化滲透。台灣具備半導體科技、山海高山步道、鐵道遺產與多元包容社會等特色，需更精準地提煉出無可取代的「台灣體驗」。
+              </p>
+            </div>
+            <div class="border border-slate-200 p-3 rounded-lg">
+              <span class="font-bold text-slate-900 block mb-1 text-indigo-600">四、旅宿價格透明度與交通可及性</span>
+              <p class="text-slate-600">
+                國內旅宿價格偏高、大眾運輸最後一哩路串聯不足，常成為國際背包客與自由行旅人的門檻。健全台灣國內交通網絡（如 Taiwan Tourist Shuttle 台灣好行）與旅宿市場價格透明度，才能真正提升各國旅人「重遊率（Repeat Visitors）」。
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer class="max-w-6xl w-full mx-auto text-center text-xs text-slate-400 pb-6">
+    國際觀光客入境人次數據分析
+  </footer>
+
+  <!-- Highcharts Initialization Logic with Safe Dependency Fallback -->
+  <script>
+    // 動態載入腳本工具函式（附備用 CDN 機制）
+    function loadScript(url) {
+      return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = url;
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error(`Failed to load ${url}`));
+        document.head.appendChild(script);
+      });
+    }
+
+    async function ensureHighchartsLoaded() {
+      if (typeof window.Highcharts !== 'undefined') {
+        return;
+      }
+      
+      const loadingState = document.getElementById('loading-state');
+      if (loadingState) loadingState.classList.remove('hidden');
+
+      // 備援 CDN 清單 (cdnjs -> unpkg -> code.highcharts.com)
+      const cdnSets = [
+        'https://unpkg.com/highcharts@11.4.0/highcharts.js',
+        'https://code.highcharts.com/highcharts.js'
+      ];
+
+      for (const cdn of cdnSets) {
+        try {
+          await loadScript(cdn);
+          if (typeof window.Highcharts !== 'undefined') {
+            break;
+          }
+        } catch (e) {
+          console.warn('CDN 加載失敗，嘗試下一個來源：', cdn);
+        }
+      }
+
+      if (loadingState) loadingState.classList.add('hidden');
+
+      if (typeof window.Highcharts === 'undefined') {
+        throw new Error('無法載入 Highcharts 資源，請檢查網路連接或允許 CDN 腳本執行。');
+      }
+    }
+
+    async function initChart() {
+      try {
+        await ensureHighchartsLoaded();
+      } catch (err) {
+        document.getElementById('chart-container').innerHTML = `
+          <div class="flex flex-col items-center justify-center h-full text-slate-500">
+            <p class="text-red-500 font-semibold mb-2">圖表載入失敗</p>
+            <p class="text-sm">${err.message}</p>
+            <button onclick="location.reload()" class="mt-4 px-4 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700">
+              重新載入頁面
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      // 2016 - 2025 官方入境國際旅客人次數據
+      const years = [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025];
+      
+      const taiwanData = [
+        10690279, 10739601, 11066742, 11864105, 1377861, 
+        140479, 895962, 6486965, 7858000, 8574547
+      ];
+      
+      const japanData = [
+        24039700, 28691073, 31191856, 31882049, 4115828, 
+        245862, 3832110, 25066350, 36870148, 42683600
+      ];
+      
+      const koreaData = [
+        17241823, 13335758, 15346879, 17502756, 2519118, 
+        967003, 3198017, 11031665, 16369634, 18937000
+      ];
+
+      let dataLabelsVisible = false;
+      let isLogScale = false;
+
+      // 初始化 Highcharts 折線圖
+      const chart = Highcharts.chart('chart-container', {
+        chart: {
+          type: 'line',
+          zooming: {
+            type: 'x'
+          },
+          style: {
+            fontFamily: 'inherit'
+          },
+          backgroundColor: 'transparent'
+        },
+        title: {
+          text: null
+        },
+        credits: {
+          enabled: false
+        },
+        xAxis: {
+          categories: years.map(String),
+          crosshair: {
+            width: 1,
+            color: '#cbd5e1',
+            dashStyle: 'Dash'
+          },
+          labels: {
+            style: {
+              color: '#64748b',
+              fontSize: '12px',
+              fontWeight: '500'
+            }
+          },
+          lineColor: '#e2e8f0',
+          tickColor: '#e2e8f0'
+        },
+        yAxis: {
+          type: 'linear',
+          title: {
+            text: '入境人次 (Visitor Arrivals)',
+            style: {
+              color: '#475569',
+              fontSize: '13px',
+              fontWeight: '600'
+            }
+          },
+          labels: {
+            formatter: function () {
+              if (this.value >= 10000000) {
+                return (this.value / 10000000).toFixed(1) + ' 千萬';
+              } else if (this.value >= 10000) {
+                return (this.value / 10000) + ' 萬';
+              }
+              return Highcharts.numberFormat(this.value, 0, '.', ',');
+            },
+            style: {
+              color: '#64748b',
+              fontSize: '12px'
+            }
+          },
+          gridLineColor: '#f1f5f9'
+        },
+        tooltip: {
+          shared: true,
+          useHTML: true,
+          backgroundColor: 'rgba(255, 255, 255, 0.96)',
+          borderColor: '#e2e8f0',
+          borderRadius: 10,
+          shadow: {
+            color: 'rgba(15, 23, 42, 0.08)',
+            offsetX: 0,
+            offsetY: 4,
+            opacity: 1,
+            width: 8
+          },
+          headerFormat: '<div class="text-xs font-semibold text-slate-500 mb-1.5 pb-1 border-b border-slate-100">{point.key} 年</div>',
+          pointFormatter: function () {
+            const formattedVal = Highcharts.numberFormat(this.y, 0, '.', ',');
+            return `
+              <div class="flex items-center justify-between gap-4 py-0.5 text-xs">
+                <span class="flex items-center gap-1.5 font-medium" style="color:${this.color}">
+                  <span class="w-2 h-2 rounded-full inline-block" style="background:${this.color}"></span>
+                  ${this.series.name}:
+                </span>
+                <span class="font-bold text-slate-800 text-right">${formattedVal} 人次</span>
+              </div>
+            `;
+          }
+        },
+        plotOptions: {
+          line: {
+            lineWidth: 3,
+            marker: {
+              radius: 5,
+              symbol: 'circle',
+              states: {
+                hover: {
+                  radius: 7,
+                  lineWidth: 2
+                }
+              }
+            },
+            dataLabels: {
+              enabled: false,
+              formatter: function () {
+                if (this.y >= 10000) {
+                  return (this.y / 10000).toFixed(0) + '萬';
+                }
+                return this.y;
+              },
+              style: {
+                fontSize: '10px',
+                fontWeight: '600',
+                textOutline: 'none'
+              }
+            }
+          }
+        },
+        colors: [
+          '#0ea5e9', // 台灣: 蔚藍色
+          '#ef4444', // 日本: 緋紅色
+          '#8b5cf6'  // 韓國: 紫羅蘭色
+        ],
+        series: [
+          {
+            name: '台灣 (Taiwan)',
+            data: taiwanData
+          },
+          {
+            name: '日本 (Japan)',
+            data: japanData
+          },
+          {
+            name: '韓國 (South Korea)',
+            data: koreaData
+          }
+        ],
+        responsive: {
+          rules: [{
+            condition: {
+              maxWidth: 600
+            },
+            chartOptions: {
+              legend: {
+                layout: 'horizontal',
+                align: 'center',
+                verticalAlign: 'bottom'
+              },
+              yAxis: {
+                labels: {
+                  align: 'left',
+                  x: 0,
+                  y: -5
+                },
+                title: {
+                  text: null
+                }
+              }
+            }
+          }]
+        },
+        exporting: {
+          enabled: true,
+          buttons: {
+            contextButton: {
+              menuItems: [
+                'downloadPNG',
+                'downloadJPEG',
+                'downloadPDF',
+                'downloadSVG',
+                'separator',
+                'downloadCSV',
+                'downloadXLS'
+              ]
+            }
+          }
+        }
+      });
+
+      // 按鈕：切換數值標籤
+      const toggleLabelsBtn = document.getElementById('btn-toggle-labels');
+      toggleLabelsBtn.addEventListener('click', () => {
+        dataLabelsVisible = !dataLabelsVisible;
+        chart.series.forEach(series => {
+          series.update({
+            dataLabels: {
+              enabled: dataLabelsVisible
+            }
+          }, false);
+        });
+        chart.redraw();
+        toggleLabelsBtn.classList.toggle('bg-indigo-600', dataLabelsVisible);
+        toggleLabelsBtn.classList.toggle('text-white', dataLabelsVisible);
+      });
+
+      // 按鈕：切換線性 / 對數刻度
+      const toggleLogBtn = document.getElementById('btn-log-scale');
+      toggleLogBtn.addEventListener('click', () => {
+        isLogScale = !isLogScale;
+        chart.yAxis[0].update({
+          type: isLogScale ? 'logarithmic' : 'linear'
+        });
+        toggleLogBtn.classList.toggle('bg-indigo-600', isLogScale);
+        toggleLogBtn.classList.toggle('text-white', isLogScale);
+      });
+    }
+
+    // 手風琴 (Accordion) 互動邏輯
+    function initAccordion() {
+      const accordionHeaders = document.querySelectorAll('.accordion-header');
+      
+      accordionHeaders.forEach(header => {
+        header.addEventListener('click', () => {
+          const content = header.nextElementSibling;
+          const chevron = header.querySelector('.chevron-icon');
+          const isExpanded = header.getAttribute('aria-expanded') === 'true';
+
+          if (isExpanded) {
+            content.classList.add('hidden');
+            header.setAttribute('aria-expanded', 'false');
+            chevron.classList.remove('rotate-180');
+          } else {
+            content.classList.remove('hidden');
+            header.setAttribute('aria-expanded', 'true');
+            chevron.classList.add('rotate-180');
+          }
+        });
+      });
+
+      // 全部展開按鈕
+      document.getElementById('btn-expand-all').addEventListener('click', () => {
+        accordionHeaders.forEach(header => {
+          const content = header.nextElementSibling;
+          const chevron = header.querySelector('.chevron-icon');
+          content.classList.remove('hidden');
+          header.setAttribute('aria-expanded', 'true');
+          chevron.classList.add('rotate-180');
+        });
+      });
+
+      // 全部收合按鈕
+      document.getElementById('btn-collapse-all').addEventListener('click', () => {
+        accordionHeaders.forEach(header => {
+          const content = header.nextElementSibling;
+          const chevron = header.querySelector('.chevron-icon');
+          content.classList.add('hidden');
+          header.setAttribute('aria-expanded', 'false');
+          chevron.classList.remove('rotate-180');
+        });
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        initChart();
+        initAccordion();
+      });
+    } else {
+      initChart();
+      initAccordion();
+    }
+  </script>
+</body>
+</html>
