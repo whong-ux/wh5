@@ -3,7 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>2025年10月–2026年9月 來臺旅客按居住地統計圓餅圖</title>
+<title>2025年10月–2026年9月 來臺旅客按國籍統計圓餅圖</title>
+<!-- 優先載入 Highcharts，若主 CDN 受阻自動切換備用 CDN (cdnjs / jsdelivr / unpkg) -->
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script>
+window.Highcharts || document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/11.4.0/highcharts.js"><\/script>');
+</script>
+<script>
+window.Highcharts || document.write('<script src="https://cdn.jsdelivr.net/npm/highcharts@11.4.0/highcharts.js"><\/script>');
+</script>
+<script>
+window.Highcharts || document.write('<script src="https://unpkg.com/highcharts@11.4.0/highcharts.js"><\/script>');
+</script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script>
+window.Highcharts && Highcharts.exporting || document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/11.4.0/modules/exporting.js"><\/script>');
+</script>
+
 <style>
 :root{
   --bg:#f1f5f9; --card:#ffffff; --ink:#0f172a; --sub:#475569; --muted:#94a3b8;
@@ -34,7 +50,6 @@ button[aria-pressed="true"]{background:var(--accent); color:#fff}
 button:focus-visible,summary:focus-visible{outline:3px solid #93c5fd; outline-offset:2px}
 .hint{font-size:.82rem; color:var(--muted); margin:0 0 4px}
 #container{width:100%; height:520px}
-.fallback{display:none; padding:40px 12px; text-align:center; color:var(--sub)}
 .table-wrap{overflow-x:auto; margin-top:12px}
 table{width:100%; border-collapse:collapse; font-size:.95rem; min-width:480px}
 th,td{padding:10px 12px; text-align:right; border-bottom:1px solid var(--line)}
@@ -82,7 +97,7 @@ footer{text-align:center; color:var(--muted); font-size:.82rem; margin-top:36px}
 
 <header>
   <span class="eyebrow">官方統計數據視覺化 • 2025年10月 – 2026年9月</span>
-  <h1>來臺旅客按居住地統計圓餅圖</h1>
+  <h1>來臺旅客按國籍統計圓餅圖</h1>
   <p class="source">資料來源：台灣交通部觀光署（民國 114 年 10 月至 115 年 9 月，已換算為西元年）</p>
 </header>
 
@@ -94,19 +109,18 @@ footer{text-align:center; color:var(--muted); font-size:.82rem; margin-top:36px}
   </div>
   <p class="hint">點擊圖例可隱藏或顯示該地區；點擊扇形可拉出；右上方功能表可匯出圖片 (PNG/PDF/SVG)</p>
   <div id="container"></div>
-  <div class="fallback" id="fallback">圖表模組載入失敗，請確認網路連線後重新整理頁面。</div>
   <div class="table-wrap">
     <table id="dataTable">
-      <thead><tr><th>居住地區</th><th>人次</th><th>占比</th></tr></thead>
+      <thead><tr><th>國籍地區</th><th>人次</th><th>占比</th></tr></thead>
       <tbody></tbody>
       <tfoot></tfoot>
     </table>
   </div>
-  <p class="note">註：本統計依旅客「居住地」分為六大地區，並非逐一國籍；「其他未列明」為居住地未能歸類者。</p>
+  <p class="note">註：本統計依旅客「國籍」所屬之六大區域進行分類歸納；「其他未列明」為國籍未詳或無法歸類者。</p>
 </section>
 
 <div class="analysis-head">
-  <h2>一年來臺客源結構深度專題研析 (2025.10 – 2026.9)</h2>
+  <h2>一年來臺旅客國籍結構深度專題研析 (2025.10 – 2026.9)</h2>
   <p>點擊各分類區塊以展開或收合詳細評析與趨勢探討</p>
 </div>
 <div class="bar">
@@ -117,118 +131,109 @@ footer{text-align:center; color:var(--muted); font-size:.82rem; margin-top:36px}
 <details class="card" open>
   <summary>
     <span class="num">01</span>
-    <span class="sum-text"><h3>前言與總體樣貌：近九成客源來自亞洲與美洲兩大板塊</h3><p>十二個月 869 萬人次的整體輪廓</p></span>
+    <span class="sum-text"><h3>前言與總體樣貌：國籍客源突破 690 萬，歐美市場份額顯著提升</h3><p>十二個月 6,900,434 人次的國籍結構分析</p></span>
     <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
   </summary>
   <div class="body">
-    <p>自 2025 年 10 月至 2026 年 9 月，來臺旅客累計達 8,693,253 人次，平均每月約 72.4 萬人次。若依居住地區觀察，客源結構呈現極為鮮明的「單極主導、次級分散」格局：亞洲地區一枝獨秀，美洲居次，歐洲與大洋洲各自維持穩定的長程客群，而非洲與其他未列明地區則僅占極小比重。</p>
+    <p>自 2025 年 10 月至 2026 年 9 月，以旅客「國籍」統計的來臺外籍旅客總數累計達 6,900,434 人次，月平均約 57.5 萬人次。相較於以「居住地」統計之數據，國籍維度呈現出亞洲以外長程市場佔比明顯拉高的樣態：亞洲國籍佔比為 76.52%，而美洲（13.90%）與歐洲（7.09%）合計已突破 20.99%，展現出臺灣在國際觀光市場中更具多元化的客源面貌。</p>
     <div class="stats">
-      <div class="stat"><b>8,693,253</b><small>十二個月來臺旅客總人次</small></div>
-      <div class="stat"><b>82.76%</b><small>亞洲地區 7,194,809 人次</small></div>
-      <div class="stat"><b>10.47%</b><small>美洲地區 909,831 人次</small></div>
-      <div class="stat"><b>4.79%</b><small>歐洲地區 416,702 人次</small></div>
+      <div class="stat"><b>6,900,434</b><small>十二個月外籍旅客總人次</small></div>
+      <div class="stat"><b>76.52%</b><small>亞洲國籍 5,280,306 人次</small></div>
+      <div class="stat"><b>13.90%</b><small>美洲國籍 959,459 人次</small></div>
+      <div class="stat"><b>7.09%</b><small>歐洲國籍 489,079 人次</small></div>
     </div>
-    <p>亞洲加上美洲合計占比高達 93.23%，意味著台灣觀光市場的穩定度，幾乎取決於這兩大區域的出行意願。這樣的結構既是台灣地理位置與航網佈局的自然結果，也同時隱含了「客源集中」的風險，值得在後續章節進一步討論。</p>
+    <p>亞洲與美洲兩大板塊合計佔全期來臺國籍旅客的 90.42%。美洲與歐洲國籍人次皆顯著高於居住地統計人數，反映出有相當數量的歐美國籍商務與觀光人士係從亞洲第三地派駐或中轉來臺，突顯臺灣跨國航線網絡與區域樞紐角色的價值。</p>
   </div>
 </details>
 
 <details class="card">
   <summary>
     <span class="num">02</span>
-    <span class="sum-text"><h3>亞洲地區：八成以上的基本盤與明顯的季節起伏</h3><p>近距離客源的規模優勢與波動特徵</p></span>
+    <span class="sum-text"><h3>亞洲國籍：佔比逾七成五，歲末年終與春季雙峰顯著</h3><p>核心基本盤的規模優勢與季度流動性</p></span>
     <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
   </summary>
   <div class="body">
-    <p>亞洲旅客在這十二個月中貢獻了 719 萬人次，是台灣觀光產業名副其實的基本盤。近距離、高頻率、航班密集，是亞洲客源的共同特徵，也使其對季節、連假與節慶檔期的反應特別敏感。</p>
+    <p>在過去十二個月中，亞洲國籍旅客累計達 5,280,306 人次，穩居臺灣入境觀光的壓倒性第一主力。由於地緣鄰近、簽證便利性與直飛航線綿密，亞洲客源的入出境節奏高度對應東亞各國的連假檔期與季節氣候。</p>
     <ul>
-      <li><b>年末旺季的高峰：</b>2025 年 12 月亞洲旅客達 794,392 人次，為這一年的單月最高，帶動當月總人次攀上 946,544 人次的全期峰值，與歲末跨年及年終旅遊檔期的拉抬相符。</li>
-      <li><b>春季的二度高點：</b>2026 年 3 月亞洲旅客回升至 721,581 人次，總人次為 883,061，是全期的第二高月份。</li>
-      <li><b>夏季的明顯低谷：</b>2026 年 6 月亞洲旅客降至 491,563 人次，為全期最低；7 月僅微幅回升至 499,220 人次，顯示盛夏並非亞洲客源來臺的強勢檔期。</li>
+      <li><b>歲末年終的全期峰值：</b>2025 年 12 月亞洲國籍旅客達 588,361 人次，帶動當月總人次攀上 755,174 人次的全期最高點，顯示聖誕跨年假期及冬季度假熱潮的強大吸力。</li>
+      <li><b>春季商務與賞花潮：</b>2026 年 3 月亞洲旅客回升至 574,438 人次，為全期第二高峰（總人次 746,627 人次），反映出春節後商務復甦與春季旅遊旺季。</li>
+      <li><b>暑期盛夏相對平緩：</b>2026 年 6 月與 7 月亞洲旅客分別降至 351,156 人次與 318,630 人次，7 月為全期單月最低，顯示臺灣酷熱夏季非東北亞旅客來臺之傳統旺季。</li>
     </ul>
-    <p>從占比來看，亞洲旅客各月大致落在 80% 至 85% 之間，最低為 2026 年 6 月的 80.4%，最高為 2026 年 8 月的 84.5%。換言之，無論淡旺季，亞洲始終是來臺客源的壓倒性多數。</p>
+    <p>亞洲各月佔比穩定維持在 73.1% 至 79.5% 之間，其中 9 月因秋季微涼與開學商務回溫，亞洲佔比再度衝上 79.5% 的高檔。</p>
   </div>
 </details>
 
 <details class="card">
   <summary>
     <span class="num">03</span>
-    <span class="sum-text"><h3>美洲、歐洲與大洋洲：長程客群的節奏與價值</h3><p>停留較久、消費較深的遠距離市場</p></span>
+    <span class="sum-text"><h3>歐美長程客群：佔比突破兩成，夏季「抗跌互補」效果顯著</h3><p>跨洲客源的節奏特性與高附加價值貢獻</p></span>
     <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
   </summary>
   <div class="body">
-    <p>相較於亞洲客源的高頻短程，美洲、歐洲與大洋洲屬於長程旅客，單次出行成本高，因此人數雖少，卻往往意味著較長的停留天數與較深度的旅遊體驗，是提升觀光產值的重要來源。</p>
-    <h4>美洲：第二大客源，且韌性明顯</h4>
-    <p>美洲地區全期累計 909,831 人次，占 10.47%。其單月人次大致維持在 5 萬至 10 萬之間，2026 年 3 月達 98,081 人次為全期高點。值得留意的是，2026 年 6 月亞洲客源跌至低谷時，美洲占比反而提高至 13.6%，顯示美洲旅客的出行節奏與亞洲並不同步，具有一定的互補作用。</p>
-    <h4>歐洲：春秋兩季的穩定來源</h4>
-    <p>歐洲地區累計 416,702 人次，占 4.79%。單月最高出現在 2026 年 3 月的 47,409 人次，其次為 2025 年 11 月的 45,191 人次；最低則為 2026 年 6 月的 23,662 人次。春、秋季氣候宜人的月份，與歐洲客群的來臺高峰大致吻合。</p>
-    <h4>大洋洲：與南半球假期同步的反向節奏</h4>
-    <p>大洋洲地區累計 148,208 人次，占 1.70%。2025 年 12 月達 20,467 人次為全期高點，2026 年 8 月則降至 6,727 人次的低點。十月至三月合計 87,977 人次，四月至九月僅 60,231 人次，與南半球的暑假及年末假期方向一致。</p>
+    <p>相較於亞洲市場的高頻短程，美洲、歐洲與大洋洲旅客以長天數、跨洲深度旅遊為主，在臺灣盛夏亞洲旅客量滑落時，發揮了極為顯著的淡季支撐作用。</p>
+    <h4>美洲國籍：近百萬人次，夏季市場佔比衝上 18%</h4>
+    <p>美洲國籍累計達 959,459 人次，佔全體旅客的 13.90%。全期單月高點出現在 2026 年 3 月（102,283 人次）與 2025 年 12 月（101,128 人次）。值得關注的是，在 2026 年 6 月亞洲客源落入低谷之際，美洲旅客達 86,415 人次，佔比躍升至 18.05%（7 月亦維持 16.97%），形成極具效益的淡季互補。</p>
+    <h4>歐洲國籍：春秋兩季表現突出，累計近 49 萬人次</h4>
+    <p>歐洲國籍累計 489,079 人次，佔 7.09%。最高月份為 2026 年 3 月的 53,891 人次，其次為 2025 年 11 月的 51,624 人次，展現歐洲客群偏好春秋宜人氣候的穩定節奏。</p>
+    <h4>大洋洲地區：年末反向避寒趨勢明顯</h4>
+    <p>大洋洲國籍累計 156,637 人次，佔 2.27%。2025 年 12 月達到 21,254 人次的單月最高峰，與南半球夏季長假及年末跨境避寒旅行習慣高度吻合。</p>
   </div>
 </details>
 
 <details class="card">
   <summary>
     <span class="num">04</span>
-    <span class="sum-text"><h3>季節輪廓：上半年度明顯強於下半年度</h3><p>以 10–3 月與 4–9 月對照的整體節奏</p></span>
+    <span class="sum-text"><h3>季度消長：上半年動能充沛，下半年迎戰季節落差</h3><p>10–3 月與 4–9 月的季節結構比較</p></span>
     <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
   </summary>
   <div class="body">
-    <p>若將十二個月切為兩半，2025 年 10 月至 2026 年 3 月合計 4,748,684 人次，占全期 54.6%；2026 年 4 月至 9 月合計 3,944,569 人次，占 45.4%。前半段多了年末旺季與春季檔期的加持，後半段則在夏季出現連續數月的相對低檔。</p>
+    <p>若將這十二個月劃分為兩大區間，前半年（2025 年 10 月至 2026 年 3 月）累計達 3,871,754 人次，佔全期總量的 56.11%；後半年（2026 年 4 月至 9 月）則為 3,028,680 人次，佔 43.89%，呈現近 84.3 萬人次的季節落差。</p>
     <table>
-      <thead><tr><th>期間</th><th>總人次</th><th>占比</th><th>特徵</th></tr></thead>
+      <thead><tr><th>統計區間</th><th>總人次</th><th>佔比</th><th>市場樣態與特徵</th></tr></thead>
       <tbody>
-        <tr><td>2025/10 – 2026/3</td><td>4,748,684</td><td>54.6%</td><td style="text-align:left">年末旺季、春季高點，12 月為全期峰值</td></tr>
-        <tr><td>2026/4 – 2026/9</td><td>3,944,569</td><td>45.4%</td><td style="text-align:left">夏季低谷，7 月為全期總人次最低 (607,534)</td></tr>
+        <tr><td>2025/10 – 2026/3</td><td>3,871,754</td><td>56.1%</td><td style="text-align:left">年末跨年潮、春季商務展覽，12 月與 3 月均突破 74 萬人次</td></tr>
+        <tr><td>2026/4 – 2026/9</td><td>3,028,680</td><td>43.9%</td><td style="text-align:left">氣候炎熱進入相對淡季，7 月探底（435,729 人次），美洲客群佔比相對提高</td></tr>
       </tbody>
     </table>
-    <p>單月總人次最高與最低之間相差約 33.9 萬人次，高低落差約 1.56 倍。對旅宿、交通與餐飲業者而言，這樣的季節差距，代表人力調度與價格策略必須因應淡旺季靈活調整，而不能以全年平均值作為規劃依據。</p>
+    <p>單月總量最高（12 月 75.5 萬人次）與最低（7 月 43.6 萬人次）相差逾 31.9 萬人次，淡旺季波動比達 1.73 倍。此一規律提醒觀光旅宿與航空業者在後半年應強化會展商務（MICE）及避暑休閒遊程之包裝推廣。</p>
   </div>
 </details>
 
 <details class="card">
   <summary>
     <span class="num">05</span>
-    <span class="sum-text"><h3>十二個月啟示：給台灣觀光客源經營的三點省思</h3><p>從集中走向多元、從人次走向價值</p></span>
+    <span class="sum-text"><h3>國籍數據啟示：推動臺灣入境觀光升級的三大策略方向</h3><p>兼顧基本盤韌性與高產值客群深耕</p></span>
     <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
   </summary>
   <div class="body">
-    <h4>一、亞洲基本盤要守，也要避免過度集中</h4>
-    <p>亞洲占比逾八成，是台灣最大的資產，也是最需要被分散的風險。任何一個主要客源市場的政策、匯率或航班變動，都可能對整體人次造成顯著影響。持續經營東北亞、東南亞等多個亞洲子市場，是維持基本盤穩固的務實做法。</p>
-    <h4>二、長程客群占比雖小，仍是提升產值的關鍵</h4>
-    <p>美洲、歐洲與大洋洲合計占 16.96%，人數不到亞洲的五分之一，但其停留時間長、旅遊深度高。與其追求人次的大幅擴張，不如針對這些市場強化深度行程、文化體驗與高山、海岸、鐵道等具辨識度的旅遊產品。</p>
-    <h4>三、善用「錯峰互補」，填補夏季低谷</h4>
-    <p>美洲客群在夏季占比相對提高、大洋洲客群集中在年末，顯示不同地區的出行節奏並不一致。若能針對六月至八月的相對淡季，設計對應的長程客群與跨區域聯名行銷，將有助於拉平全年的人次曲線，提升旅宿與交通的整體使用效率。</p>
-    <p>整體而言，這一年的數據顯示台灣觀光「基本盤穩、結構偏集中、季節差距明顯」。未來的觀光策略，或許更適合以「客源多元化」與「淡季經營」為兩大主軸，而不僅是單純追求年度人次的數字。</p>
+    <h4>一、鞏固亞洲核心，深耕東南亞與東北亞分群行銷</h4>
+    <p>亞洲國籍佔比達 76.52%，是臺灣觀光創匯的命脈。因應不同客源國的度假習性（如日本黃金週、韓國冬季避寒、東南亞連假），推動差異化主題（鐵道、美食、文化探訪），持續保持高回訪率。</p>
+    <h4>二、重視歐美高產值長程客群，擴大延伸停留價值</h4>
+    <p>美歐大洋洲合計佔比超過 23.26%，每 4 位外籍旅客中就有一位來自長程市場。歐美旅客停留天數多在 7 至 14 天以上，對於中南部與東部之國家公園、原住民文化及綠色永續步道接受度高，是帶動非都會區觀光經濟的關鍵主力。</p>
+    <h4>三、精準運用「錯峰行銷」，平抑夏季淡季波動</h4>
+    <p>6 至 8 月亞洲市場轉淡，但美歐長程家庭與學生暑假出遊意願旺盛。觀光產業界應善用夏季舉辦之國際藝術節、音樂季及科技研討會，結合高鐵周遊券等優惠，吸引歐美旅客延長在臺停留，促進全年產業營運均衡。</p>
+    <p>綜觀整期數據，臺灣入境客源展現「亞洲基底穩健、長程客群具韌性」的健康特質。未來行銷聚焦客群多元化與深化在地體驗，將是驅動觀光經濟穩健前行的最佳方針。</p>
   </div>
 </details>
 
-<footer>來臺旅客按居住地統計數據分析・民國 114 年 10 月至 115 年 9 月（2025.10 – 2026.9）</footer>
+<footer>來臺旅客按國籍統計數據分析・民國 114 年 10 月至 115 年 9 月（2025.10 – 2026.9）</footer>
 </div>
 
-<!-- Highcharts 主要 CDN 與備用 CDN 機制 -->
-<script src="https://code.highcharts.com/highcharts.js"></script>
-<script>
-if (typeof Highcharts === 'undefined') {
-  document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/11.4.0/highcharts.js"><\/script>');
-}
-</script>
-<script src="https://code.highcharts.com/modules/exporting.js"></script>
-<script src="https://code.highcharts.com/modules/accessibility.js"></script>
 <script>
 window.addEventListener("DOMContentLoaded", function () {
-  // ===== 資料（來源：來臺旅客按居住地統計.xlsx，114/10–115/9 → 2025/10–2026/9）=====
+  // ===== 國籍統計資料（來源：來臺旅客按國籍統計.xlsx，民國114/10–115/9 → 西元2025/10–2026/9）=====
   var raw = [
-    { name: '亞洲地區',   y: 7194809, color: '#1d4ed8' },
-    { name: '美洲地區',   y: 909831,  color: '#0d9488' },
-    { name: '歐洲地區',   y: 416702,  color: '#f59e0b' },
-    { name: '大洋洲地區', y: 148208,  color: '#8b5cf6' },
-    { name: '非洲地區',   y: 13624,   color: '#ef4444' },
-    { name: '其他未列明', y: 10079,   color: '#94a3b8' }
+    { name: '亞洲地區',   y: 5280306, color: '#1d4ed8' },
+    { name: '美洲地區',   y: 959459,  color: '#0d9488' },
+    { name: '歐洲地區',   y: 489079,  color: '#f59e0b' },
+    { name: '大洋洲地區', y: 156637,  color: '#8b5cf6' },
+    { name: '非洲地區',   y: 14165,   color: '#ef4444' },
+    { name: '其他未列明', y: 788,     color: '#94a3b8' }
   ];
   var total = raw.reduce(function (s, d) { return s + d.y; }, 0);
   var fmt = function (n) { return n.toLocaleString('en-US'); };
 
-  // ===== 資料表 =====
+  // 填寫表格
   var tbody = document.querySelector('#dataTable tbody');
   raw.forEach(function (d) {
     var tr = document.createElement('tr');
@@ -239,69 +244,76 @@ window.addEventListener("DOMContentLoaded", function () {
   document.querySelector('#dataTable tfoot').innerHTML =
     '<tr><td>總計</td><td>' + fmt(total) + '</td><td>100.00%</td></tr>';
 
-  // ===== 摺疊區塊 =====
+  // 摺疊按鈕
   var blocks = document.querySelectorAll('details');
   document.getElementById('openAll').onclick = function () { blocks.forEach(function (d) { d.open = true; }); };
   document.getElementById('closeAll').onclick = function () { blocks.forEach(function (d) { d.open = false; }); };
 
-  // ===== 圖表 =====
-  if (typeof Highcharts === 'undefined') {
-    document.getElementById('container').style.display = 'none';
-    document.getElementById('fallback').style.display = 'block';
-    return;
-  }
-  Highcharts.setOptions({ lang: { thousandsSep: ',', numericSymbols: null } });
-
-  var showLabels = true, donut = false;
-  var chart = Highcharts.chart('container', {
-    chart: { type: 'pie', backgroundColor: 'transparent', style: { fontFamily: '"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif' } },
-    title: { text: '2025年10月 – 2026年9月 來臺旅客按居住地分布', style: { fontSize: '1.05rem', fontWeight: '700' } },
-    subtitle: { text: '總計 ' + fmt(total) + ' 人次' },
-    credits: { enabled: false },
-    tooltip: { pointFormat: '<b>{point.y:,.0f}</b> 人次<br>占比 <b>{point.percentage:.2f}%</b>' },
-    legend: { enabled: true, itemStyle: { fontWeight: '500' } },
-    plotOptions: {
-      pie: {
-        allowPointSelect: true,
-        cursor: 'pointer',
-        showInLegend: true,
-        borderColor: '#ffffff',
-        borderWidth: 2,
-        innerSize: '0%',
-        dataLabels: {
-          enabled: true,
-          distance: 24,
-          format: '{point.name}<br>{point.percentage:.1f}%',
-          style: { fontSize: '0.85rem', fontWeight: '500', textOutline: 'none' },
-          connectorShape: 'crookedLine'
-        }
-      }
-    },
-    series: [{
-      name: '來臺旅客',
-      colorByPoint: true,
-      data: raw.map(function (d, i) { return { name: d.name, y: d.y, color: d.color, sliced: i === 0, selected: i === 0 }; })
-    }],
-    responsive: {
-      rules: [{
-        condition: { maxWidth: 520 },
-        chartOptions: { plotOptions: { pie: { dataLabels: { distance: 8, format: '{point.percentage:.1f}%' } } } }
-      }]
+  // 繪製 Highcharts 圖表（帶有重試檢測機制）
+  function renderChart() {
+    if (typeof Highcharts === 'undefined') {
+      setTimeout(renderChart, 200);
+      return;
     }
-  });
+    Highcharts.setOptions({ lang: { thousandsSep: ',', numericSymbols: null } });
 
-  var btnL = document.getElementById('btnLabels');
-  var btnD = document.getElementById('btnDonut');
-  btnL.onclick = function () {
-    showLabels = !showLabels;
-    btnL.setAttribute('aria-pressed', showLabels);
-    chart.series[0].update({ dataLabels: { enabled: showLabels } });
-  };
-  btnD.onclick = function () {
-    donut = !donut;
-    btnD.setAttribute('aria-pressed', donut);
-    chart.series[0].update({ innerSize: donut ? '55%' : '0%' });
-  };
+    var showLabels = true, donut = false;
+    var chart = Highcharts.chart('container', {
+      chart: { 
+        type: 'pie', 
+        backgroundColor: 'transparent', 
+        style: { fontFamily: '"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif' } 
+      },
+      title: { text: '2025年10月 – 2026年9月 來臺旅客按國籍分布', style: { fontSize: '1.05rem', fontWeight: '700' } },
+      subtitle: { text: '總計 ' + fmt(total) + ' 人次' },
+      credits: { enabled: false },
+      tooltip: { pointFormat: '<b>{point.y:,.0f}</b> 人次<br>占比 <b>{point.percentage:.2f}%</b>' },
+      legend: { enabled: true, itemStyle: { fontWeight: '500' } },
+      plotOptions: {
+        pie: {
+          allowPointSelect: true,
+          cursor: 'pointer',
+          showInLegend: true,
+          borderColor: '#ffffff',
+          borderWidth: 2,
+          innerSize: '0%',
+          dataLabels: {
+            enabled: true,
+            distance: 24,
+            format: '{point.name}<br>{point.percentage:.1f}%',
+            style: { fontSize: '0.85rem', fontWeight: '500', textOutline: 'none' },
+            connectorShape: 'crookedLine'
+          }
+        }
+      },
+      series: [{
+        name: '國籍旅客',
+        colorByPoint: true,
+        data: raw.map(function (d, i) { return { name: d.name, y: d.y, color: d.color, sliced: i === 0, selected: i === 0 }; })
+      }],
+      responsive: {
+        rules: [{
+          condition: { maxWidth: 520 },
+          chartOptions: { plotOptions: { pie: { dataLabels: { distance: 8, format: '{point.percentage:.1f}%' } } } }
+        }]
+      }
+    });
+
+    var btnL = document.getElementById('btnLabels');
+    var btnD = document.getElementById('btnDonut');
+    btnL.onclick = function () {
+      showLabels = !showLabels;
+      btnL.setAttribute('aria-pressed', showLabels);
+      chart.series[0].update({ dataLabels: { enabled: showLabels } });
+    };
+    btnD.onclick = function () {
+      donut = !donut;
+      btnD.setAttribute('aria-pressed', donut);
+      chart.series[0].update({ innerSize: donut ? '55%' : '0%' });
+    };
+  }
+
+  renderChart();
 });
 </script>
 </body>
