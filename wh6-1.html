@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2025年10月–2026年9月 來臺旅客按國籍統計圖表</title>
+<style>
+:root{
+  --bg:#f1f5f9; --card:#ffffff; --ink:#0f172a; --sub:#475569; --muted:#94a3b8;
+  --line:#e2e8f0; --accent:#1d4ed8; --accent-soft:#dbeafe; --radius:16px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,-apple-system,sans-serif;
+  line-height:1.85; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1040px; margin:0 auto; padding:40px 20px 72px}
+header{text-align:center; margin-bottom:28px}
+.eyebrow{display:inline-block; font-size:.85rem; color:var(--accent); background:var(--accent-soft); padding:4px 14px; border-radius:999px; font-weight:600}
+h1{font-size:clamp(1.6rem,4.2vw,2.5rem); line-height:1.3; margin:16px 0 10px; letter-spacing:.02em}
+.source{color:var(--sub); font-size:.9rem; margin:0}
+.card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:0 1px 2px rgba(15,23,42,.04),0 8px 24px rgba(15,23,42,.05)}
+.chart-card{padding:20px 20px 16px}
+.controls{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:8px}
+.controls span{font-size:.9rem; color:var(--sub); font-weight:600}
+button{
+  font:inherit; font-size:.9rem; cursor:pointer; color:var(--accent); background:#fff;
+  border:1px solid var(--accent); border-radius:999px; padding:6px 16px; transition:background .15s,color .15s;
+}
+button:hover{background:var(--accent-soft)}
+button[aria-pressed="true"]{background:var(--accent); color:#fff}
+button:focus-visible,summary:focus-visible{outline:3px solid #93c5fd; outline-offset:2px}
+.hint{font-size:.82rem; color:var(--muted); margin:0 0 4px}
+#container{width:100%; height:520px}
+.fallback{display:none; padding:40px 12px; text-align:center; color:var(--sub)}
+.table-wrap{overflow-x:auto; margin-top:12px}
+table{width:100%; border-collapse:collapse; font-size:.95rem; min-width:480px}
+th,td{padding:10px 12px; text-align:right; border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left}
+thead th{background:#f8fafc; color:var(--sub); font-weight:600}
+tfoot td{font-weight:700; border-bottom:none}
+.dot{display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:8px}
+.note{font-size:.82rem; color:var(--muted); margin:10px 2px 0}
+
+.analysis-head{margin:48px 0 6px; text-align:center}
+.analysis-head h2{font-size:clamp(1.3rem,3vw,1.75rem); margin:0 0 6px}
+.analysis-head p{margin:0; color:var(--sub); font-size:.92rem}
+.bar{display:flex; justify-content:center; gap:10px; margin:16px 0 18px}
+details{margin-bottom:14px; overflow:hidden}
+summary{list-style:none; cursor:pointer; padding:20px 24px; display:flex; gap:16px; align-items:flex-start}
+summary::-webkit-details-marker{display:none}
+.num{flex:none; font-weight:800; font-size:1.5rem; color:var(--accent); line-height:1.3; min-width:2.2rem}
+.sum-text h3{margin:0; font-size:1.1rem; line-height:1.5}
+.sum-text p{margin:2px 0 0; color:var(--sub); font-size:.88rem; line-height:1.6}
+.chev{margin-left:auto; flex:none; width:22px; height:22px; color:var(--muted); transition:transform .2s}
+details[open] .chev{transform:rotate(180deg)}
+.body{padding:0 24px 24px 24px; border-top:1px solid var(--line)}
+.body p{margin:16px 0 0; text-align:justify}
+.body h4{margin:22px 0 0; font-size:1rem; color:var(--accent)}
+.body h4+p{margin-top:4px}
+.body ul{margin:14px 0 0; padding-left:1.2em}
+.body li{margin-bottom:8px}
+.stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin-top:18px}
+.stat{background:#f8fafc; border:1px solid var(--line); border-radius:12px; padding:14px 16px}
+.stat b{display:block; font-size:1.35rem; line-height:1.4}
+.stat small{color:var(--sub)}
+.body table{margin-top:18px; font-size:.92rem}
+footer{text-align:center; color:var(--muted); font-size:.82rem; margin-top:36px}
+
+.sec-head{margin:64px 0 6px; text-align:center}
+.sec-head h2{font-size:clamp(1.4rem,3.4vw,2rem); margin:12px 0 6px; line-height:1.35}
+.sec-head p{margin:0; color:var(--sub); font-size:.92rem}
+.mt{margin-top:18px}
+.chart-card h3{margin:0 0 2px; font-size:1.05rem}
+.chart-card .lead{margin:0 0 8px; color:var(--sub); font-size:.88rem}
+#barChart{width:100%; height:460px}
+#lineChart{width:100%; height:420px}
+.hbar{display:grid; grid-template-columns:84px 1fr 96px; gap:10px; align-items:center; margin:7px 0; font-size:.92rem}
+.hbar .tr{height:18px; background:#e2e8f0; border-radius:9px; overflow:hidden}
+.hbar .fl{height:100%; border-radius:9px; min-width:3px}
+.hbar .vl{text-align:right; font-variant-numeric:tabular-nums; color:var(--sub)}
+.sticky-col td:first-child, .sticky-col th:first-child{position:sticky; left:0; background:#fff}
+.sticky-col thead th:first-child{background:#f8fafc}
+.mtable{min-width:900px; font-size:.88rem}
+.mtable td,.mtable th{padding:8px 10px; white-space:nowrap}
+.mtable tr.tot td{font-weight:700; background:#f8fafc}
+@media (max-width:600px){
+  #container{height:440px}
+  #barChart{height:420px}
+  #lineChart{height:380px}
+  .hbar{grid-template-columns:64px 1fr 76px; gap:6px; font-size:.85rem}
+  summary{padding:16px}
+  .body{padding:0 16px 20px}
+  .body p{text-align:left}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <span class="eyebrow">官方統計數據視覺化 • 2025年10月 – 2026年9月</span>
+  <h1>來臺旅客按國籍統計圖表</h1>
+  <p class="source">資料來源：台灣交通部觀光署（民國 114 年 10 月至 115 年 9 月，已換算為西元年）</p>
+</header>
+
+<section class="card chart-card" aria-label="圓餅圖">
+  <div class="controls">
+    <span>視圖控制：</span>
+    <button id="btnLabels" type="button" aria-pressed="true">切換數值標籤</button>
+    <button id="btnDonut" type="button" aria-pressed="false">圓餅 / 環圈圖</button>
+  </div>
+  <p class="hint">點擊圖例可隱藏或顯示該地區（比例自動重算）；點擊扇形可拉出並顯示數值；右上方功能表可匯出圖片 (PNG/PDF/SVG)</p>
+  <div id="container"></div>
+  <div class="fallback" id="fallback">圖表模組載入失敗，請確認網路連線後重新整理頁面。</div>
+  <div class="table-wrap">
+    <table id="dataTable">
+      <thead><tr><th>國籍所屬地區</th><th>人次</th><th>占比</th></tr></thead>
+      <tbody></tbody>
+      <tfoot></tfoot>
+    </table>
+  </div>
+  <p class="note">註：本統計依旅客「國籍」彙整為六大地區，非逐一國家；「其他未列明」為國籍未能歸類者。</p>
+</section>
+
+<div class="analysis-head">
+  <h2>一年來臺客源國籍結構深度專題研析 (2025.10 – 2026.9)</h2>
+  <p>點擊各分類區塊以展開或收合詳細評析與趨勢探討</p>
+</div>
+<div class="bar">
+  <button type="button" id="openAll">全部展開</button>
+  <button type="button" id="closeAll">全部收合</button>
+</div>
+
+<details class="card" open>
+  <summary>
+    <span class="num">01</span>
+    <span class="sum-text"><h3>前言與總體樣貌：九成客源集中於亞洲與美洲國籍旅客</h3><p>十二個月 690 萬人次的整體輪廓</p></span>
+    <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+  </summary>
+  <div class="body">
+    <p>自 2025 年 10 月至 2026 年 9 月，依國籍統計的來臺旅客累計達 6,900,434 人次，平均每月約 57.5 萬人次。若依國籍所屬地區觀察，客源結構呈現「單極主導、次級分散」的格局：亞洲國籍旅客占逾四分之三，美洲居次，歐洲與大洋洲各自維持穩定的長程客群，非洲與其他未列明則僅占極小比重。</p>
+    <div class="stats">
+      <div class="stat"><b>6,900,434</b><small>十二個月來臺旅客總人次</small></div>
+      <div class="stat"><b>76.52%</b><small>亞洲 5,280,306 人次</small></div>
+      <div class="stat"><b>13.90%</b><small>美洲 959,459 人次</small></div>
+      <div class="stat"><b>7.09%</b><small>歐洲 489,079 人次</small></div>
+    </div>
+    <p>亞洲與美洲合計占比達 90.43%，也就是說台灣觀光市場的穩定度，絕大部分取決於這兩個地區旅客的出行意願。歐洲與大洋洲合計約 9.4%，雖然比重不高，卻是長程、長停留客群的代表。這樣的結構既反映了台灣的地理位置與航網佈局，也隱含客源集中的風險，後續章節將進一步說明。</p>
+  </div>
+</details>
+
+<details class="card">
+  <summary>
+    <span class="num">02</span>
+    <span class="sum-text"><h3>亞洲國籍旅客：七成以上的基本盤與明顯的季節起伏</h3><p>近距離客源的規模優勢與波動特徵</p></span>
+    <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+  </summary>
+  <div class="body">
+    <p>亞洲國籍旅客在這十二個月中貢獻 528 萬人次，是台灣觀光產業的基本盤。近距離、高頻率、航班密集，是亞洲客源的共同特徵，也使其對季節、連假與節慶檔期的反應特別敏感。</p>
+    <ul>
+      <li><b>年末旺季的高峰：</b>2025 年 12 月亞洲旅客達 588,361 人次，為全期單月最高，帶動當月總人次攀上 755,174 人次的全期峰值。</li>
+      <li><b>春季的二度高點：</b>2026 年 3 月亞洲旅客回升至 574,438 人次，總人次為 746,627，是全期第二高月份。</li>
+      <li><b>夏季的明顯低谷：</b>2026 年 7 月亞洲旅客降至 318,630 人次，為全期最低，6 月亦僅 351,156 人次，顯示盛夏並非亞洲客源來臺的強勢檔期。</li>
+    </ul>
+    <p>從占比來看，亞洲旅客各月落在 73.1% 至 79.5% 之間：最低為 2026 年 7 月，最高為 2026 年 9 月。亞洲單月人次的高低落差達 26.97 萬人次（588,361 對 318,630），是六大地區中季節擺幅最大的一群，也是整體淡旺季差距的主要來源。</p>
+  </div>
+</details>
+
+<details class="card">
+  <summary>
+    <span class="num">03</span>
+    <span class="sum-text"><h3>美洲、歐洲與大洋洲：長程客群的節奏與價值</h3><p>停留較久、消費較深的遠距離市場</p></span>
+    <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+  </summary>
+  <div class="body">
+    <p>相較於亞洲客源的高頻短程，美洲、歐洲與大洋洲三區合計 1,605,175 人次，占 23.26%。長程旅客單次出行成本高，往往意味著較長的停留天數與較深度的旅遊體驗，是提升觀光產值的重要來源。</p>
+    <h4>美洲：第二大客源，且韌性明顯</h4>
+    <p>美洲國籍旅客累計 959,459 人次，占 13.90%。單月人次多落在 5.4 萬至 10.2 萬之間，2026 年 3 月達 102,283 人次為全期高點，2025 年 12 月亦達 101,128 人次。值得留意的是，2026 年 6 月亞洲客源走入低檔時，美洲占比反而升至 18.1%，7 月仍有 17.0%，顯示美洲旅客的出行節奏與亞洲並不同步，具有互補作用。</p>
+    <h4>歐洲：春秋兩季的穩定來源</h4>
+    <p>歐洲國籍旅客累計 489,079 人次，占 7.09%。單月最高為 2026 年 3 月的 53,891 人次，其次為 2025 年 11 月的 51,624 人次；最低為 2026 年 6 月的 29,023 人次。春、秋季氣候宜人的月份，與歐洲客群的來臺高峰大致吻合。</p>
+    <h4>大洋洲：與南半球假期同步的反向節奏</h4>
+    <p>大洋洲國籍旅客累計 156,637 人次，占 2.27%。2025 年 12 月達 21,254 人次為全期高點，2026 年 8 月則降至 7,851 人次的低點。十月至三月合計 91,779 人次，四月至九月為 64,858 人次，與南半球的暑假及年末假期方向一致。</p>
+  </div>
+</details>
+
+<details class="card">
+  <summary>
+    <span class="num">04</span>
+    <span class="sum-text"><h3>季節輪廓：上半年度明顯強於下半年度</h3><p>以 10–3 月與 4–9 月對照的整體節奏</p></span>
+    <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+  </summary>
+  <div class="body">
+    <p>若將十二個月切為兩半，2025 年 10 月至 2026 年 3 月合計 3,871,754 人次，占全期 56.1%；2026 年 4 月至 9 月合計 3,028,680 人次，占 43.9%。前半段有年末旺季與春季檔期的加持，後半段則在夏季出現連續數月的相對低檔。</p>
+    <table>
+      <thead><tr><th>期間</th><th>總人次</th><th>占比</th><th>特徵</th></tr></thead>
+      <tbody>
+        <tr><td>2025/10 – 2026/3</td><td>3,871,754</td><td>56.1%</td><td style="text-align:left">年末旺季、春季高點，12 月為全期峰值</td></tr>
+        <tr><td>2026/4 – 2026/9</td><td>3,028,680</td><td>43.9%</td><td style="text-align:left">夏季低谷，7 月為全期最低 (435,729)</td></tr>
+      </tbody>
+    </table>
+    <p>單月總人次最高（2025 年 12 月，755,174）與最低（2026 年 7 月，435,729）相差約 31.9 萬人次，高低落差約 1.73 倍。對旅宿、交通與餐飲業者而言，這代表人力調度與價格策略必須因應淡旺季靈活調整，而不能以全年平均值作為規劃依據。</p>
+  </div>
+</details>
+
+<details class="card">
+  <summary>
+    <span class="num">05</span>
+    <span class="sum-text"><h3>十二個月啟示：給台灣觀光客源經營的三點省思</h3><p>從集中走向多元、從人次走向價值</p></span>
+    <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+  </summary>
+  <div class="body">
+    <h4>一、亞洲基本盤要守，也要避免過度集中</h4>
+    <p>亞洲國籍旅客占比逾七成五，是台灣最大的資產，也是最需要被分散的風險。任何主要客源市場的政策、匯率或航班變動，都可能對整體人次造成顯著影響。持續經營東北亞、東南亞等多個亞洲子市場，是維持基本盤穩固的務實做法。</p>
+    <h4>二、長程客群占比雖小，仍是提升產值的關鍵</h4>
+    <p>美洲、歐洲與大洋洲合計占 23.26%，人數約為亞洲的三成，但其停留時間長、旅遊深度高。與其追求人次的大幅擴張，不如針對這些市場強化深度行程、文化體驗與高山、海岸、鐵道等具辨識度的旅遊產品。</p>
+    <h4>三、善用「錯峰互補」，填補夏季低谷</h4>
+    <p>美洲客群在六、七月占比相對提高，大洋洲客群集中於年末，顯示不同地區的出行節奏並不一致。若能針對六月至八月的相對淡季，設計對應的長程客群與跨區域聯名行銷，將有助於拉平全年的人次曲線，提升旅宿與交通的整體使用效率。</p>
+    <p>整體而言，這一年的數據顯示台灣觀光「基本盤穩、結構偏集中、季節差距明顯」。未來的觀光策略，或許更適合以「客源多元化」與「淡季經營」為兩大主軸，而不僅是追求年度人次的數字。</p>
+  </div>
+</details>
+
+<div class="sec-head">
+  <span class="eyebrow">專題二 • 東南亞與印度主要客源市場</span>
+  <h2>東南亞九國與印度 來臺旅客人次統計 (2025.10 – 2026.9)</h2>
+  <p>資料來源：台灣交通部觀光署（依國籍別，民國 114 年 10 月至 115 年 9 月，已換算為西元年）</p>
+</div>
+
+<section class="card chart-card mt" aria-label="各國累計人次長條圖">
+  <h3>十二個月累計來臺人次排行</h3>
+  <p class="lead">橫向長條圖依累計人次由高到低排列，便於比較各國規模差距</p>
+  <div class="controls">
+    <span>視圖控制：</span>
+    <button id="btnLog" type="button" aria-pressed="false">對數 / 線性刻度</button>
+  </div>
+  <p class="hint">小國家（寮國、汶萊等）在線性刻度下長條極短，可切換為對數刻度；右上方功能表可匯出圖片</p>
+  <div id="barChart"></div>
+  <p class="note">註：檔案內容為越南、泰國、馬來西亞、新加坡、菲律賓、汶萊、柬埔寨、寮國、緬甸及印度共十個國家，不含印尼；印度並非東協成員，但屬新南向政策目標國。</p>
+</section>
+
+<section class="card chart-card mt" aria-label="月別趨勢折線圖">
+  <h3>前五大客源國 月別來臺趨勢</h3>
+  <p class="lead">折線圖呈現累計前五名國家在十二個月中的起伏，點擊圖例可隱藏或顯示該國</p>
+  <div id="lineChart"></div>
+</section>
+
+<section class="card chart-card mt" aria-label="月別資料表">
+  <h3>月別來臺人次明細</h3>
+  <div class="table-wrap sticky-col"><table class="mtable" id="monthTable"><thead></thead><tbody></tbody></table></div>
+  <p class="note">欄位順序依原始 Excel 排列；小計為十國加總。</p>
+</section>
+
+<div class="analysis-head">
+  <h2>東南亞與印度客源深度專題研析</h2>
+  <p>點擊各分類區塊以展開或收合詳細評析與趨勢探討</p>
+</div>
+
+<details class="card" open>
+  <summary>
+    <span class="num">01</span>
+    <span class="sum-text"><h3>前言與總體樣貌：249 萬人次、五國就占 96%</h3><p>十個國家十二個月的整體輪廓</p></span>
+    <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+  </summary>
+  <div class="body">
+    <p>2025 年 10 月至 2026 年 9 月，這十個國家的旅客合計 2,494,237 人次，平均每月約 20.8 萬人次，約相當於前一專題國籍統計中亞洲旅客總數（5,280,306 人次）的 47.2%。換句話說，來臺的亞洲國籍旅客中，將近一半來自這些新南向相關市場。</p>
+    <div class="stats">
+      <div class="stat"><b>2,494,237</b><small>十國十二個月合計人次</small></div>
+      <div class="stat"><b>741,033</b><small>菲律賓，占 29.71%，居第一</small></div>
+      <div class="stat"><b>96.15%</b><small>前五名（菲、越、泰、馬、新）合計占比</small></div>
+      <div class="stat"><b>1.74 倍</b><small>單月最高（3 月）與最低（8 月）的落差</small></div>
+    </div>
+    <p>結構上呈現明顯的「頭部集中」：菲律賓、越南、泰國、馬來西亞、新加坡五國合計 2,398,119 人次，其餘五國（印度、緬甸、柬埔寨、汶萊、寮國）合計僅 96,118 人次，占 3.85%。其中馬來西亞、新加坡、泰國三國規模相近，都落在 39 萬至 41 萬人次之間，排名差距不大。</p>
+  </div>
+</details>
+
+<details class="card">
+  <summary>
+    <span class="num">02</span>
+    <span class="sum-text"><h3>菲律賓：每個月都是第一名的穩定基本盤</h3><p>規模最大，波動也相對最小</p></span>
+    <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+  </summary>
+  <div class="body">
+    <p>菲律賓累計 741,033 人次，占十國合計的 29.71%，在十二個月中每個月都是十國裡人數最多的市場。單月人次落在 47,420（2026 年 8 月）至 81,044（2026 年 3 月）之間，高低落差約 1.7 倍，相較於新加坡等國的大幅起伏，菲律賓客源顯得平穩許多。</p>
+    <ul>
+      <li><b>春季高點：</b>2026 年 3 月的 81,044 人次為全期最高，2025 年 12 月（72,038）與 2026 年 1 月（70,388）也維持在 7 萬人次以上。</li>
+      <li><b>夏季回落但不跌深：</b>2026 年 7、8 月分別為 51,017 與 47,420 人次，仍高於多數國家的旺季水準。</li>
+      <li><b>半年度分布：</b>10–3 月合計 398,169 人次，4–9 月合計 342,864 人次，前後半年差距相對有限。</li>
+    </ul>
+    <p>對旅宿與航空業者而言，菲律賓是全年都能提供穩定需求的基底市場，也是淡季經營時最可依賴的客群。</p>
+  </div>
+</details>
+
+<details class="card">
+  <summary>
+    <span class="num">03</span>
+    <span class="sum-text"><h3>越南、泰國、馬來西亞、新加坡：旺淡季節奏各不相同</h3><p>同為前五大，起伏方式卻很不一樣</p></span>
+    <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+  </summary>
+  <div class="body">
+    <h4>越南：全年最「逆勢」的市場</h4>
+    <p>越南累計 465,626 人次，居第二。有別於泰、馬、新三國都集中在年末，越南的高點出現在 2026 年 3 月（57,612 人次），最低點則是 2025 年 11 月（30,321 人次）。更特別的是，越南是前五大中唯一下半年度（4–9 月，236,225 人次）高於上半年度（10–3 月，229,401 人次）的市場，夏季的 7、8 月都維持在 4 萬人次以上，正好補上其他國家的淡季缺口。</p>
+    <h4>泰國與馬來西亞：年末旺季明顯</h4>
+    <p>泰國累計 408,149 人次，馬來西亞累計 395,233 人次，兩國的單月高點都落在 2025 年 12 月（分別為 47,858 與 49,463 人次），低點則在夏季（泰國 2026 年 8 月 22,656；馬來西亞 2026 年 7 月 21,470）。10–3 月與 4–9 月相比，泰國為 227,647 對 180,502，馬來西亞為 232,798 對 162,435，上半年度明顯較強。</p>
+    <h4>新加坡：起伏幅度最大</h4>
+    <p>新加坡累計 388,078 人次，單月高點為 2025 年 12 月的 66,271 人次，低點則是 2026 年 8 月的 16,446 人次，兩者相差約 4 倍，是前五大市場中季節擺幅最劇烈的一個。11 月（52,015）與 12 月合計就有 118,286 人次，約占全期的 30%，顯示新加坡客群對年末假期相當敏感。</p>
+  </div>
+</details>
+
+<details class="card">
+  <summary>
+    <span class="num">04</span>
+    <span class="sum-text"><h3>印度及中南半島小國：規模雖小，趨勢值得追蹤</h3><p>印度、緬甸、柬埔寨、汶萊與寮國</p></span>
+    <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+  </summary>
+  <div class="body">
+    <p>印度累計 60,661 人次，占 2.43%，是前五名之外最大的市場；單月人次介於 3,936（2026 年 1 月）至 6,319（2026 年 3 月）之間，波動不大，呈現出平穩的小規模客源。緬甸累計 20,855 人次，占 0.84%，後半年度（11,601 人次）反而多於前半年度（9,254 人次），8、9 月分別達 2,376 與 2,367 人次，為該國全期較高的月份。</p>
+    <p>柬埔寨（11,250 人次）、汶萊（2,385 人次）與寮國（967 人次）三國合計僅占 0.59%，單月人數多在數百至一千多人之間，屬於極小規模的市場，月與月之間的變動容易受到少數團體或活動影響，解讀時不宜過度放大。</p>
+  </div>
+</details>
+
+<details class="card">
+  <summary>
+    <span class="num">05</span>
+    <span class="sum-text"><h3>十二個月啟示：給新南向客源經營的三點省思</h3><p>從單點依賴走向錯峰互補</p></span>
+    <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+  </summary>
+  <div class="body">
+    <h4>一、用菲律賓的穩定，撐起淡季底盤</h4>
+    <p>菲律賓每月都居首位、波動最小，是最適合作為全年穩定需求的核心市場。航班、旅宿與地面服務若能針對這個客群持續經營，可降低整體客源在夏季的下滑幅度。</p>
+    <h4>二、善用越南的逆季節性</h4>
+    <p>越南在 7、8 月仍有逾 4 萬人次，與泰、馬、新的夏季低谷形成互補。針對越南市場設計暑期專案，有機會填補六至八月的需求空窗。</p>
+    <h4>三、對年末假期集中的市場做產能與價格規劃</h4>
+    <p>新加坡、馬來西亞與泰國都在 12 月衝上高峰，其中新加坡的旺淡季落差高達約 4 倍。業者宜提早做好年末產能與價格安排，並在其他月份以主題行程或旅展推廣，避免客源過度集中在單一月份。</p>
+    <p>整體而言，這十個國家在十二個月中呈現「頭部集中、旺淡互補」的樣貌。未來若能同時顧及規模與節奏，即在守住菲律賓基本盤的同時，運用越南等逆季節市場拉平曲線，將有助於提升全年的客源穩定度。</p>
+  </div>
+</details>
+
+<footer>來臺旅客按國籍統計數據分析・民國 114 年 10 月至 115 年 9 月（2025.10 – 2026.9）・含東南亞九國與印度專題</footer>
+</div>
+
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script>
+(function () {
+  // ===== 資料（來源：來臺旅客按國籍統計.xlsx，114/10–115/9 → 2025/10–2026/9）=====
+  var raw = [
+    { name: '亞洲地區',   y: 5280306, color: '#1d4ed8' },
+    { name: '美洲地區',   y: 959459,  color: '#0d9488' },
+    { name: '歐洲地區',   y: 489079,  color: '#f59e0b' },
+    { name: '大洋洲地區', y: 156637,  color: '#8b5cf6' },
+    { name: '非洲地區',   y: 14165,   color: '#ef4444' },
+    { name: '其他未列明', y: 788,     color: '#94a3b8' }
+  ];
+  var total = raw.reduce(function (s, d) { return s + d.y; }, 0);
+  var fmt = function (n) { return n.toLocaleString('en-US'); };
+
+  // ===== 資料表 =====
+  var tbody = document.querySelector('#dataTable tbody');
+  raw.forEach(function (d) {
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td><span class="dot" style="background:' + d.color + '"></span>' + d.name +
+      '</td><td>' + fmt(d.y) + '</td><td>' + (d.y / total * 100).toFixed(2) + '%</td>';
+    tbody.appendChild(tr);
+  });
+  document.querySelector('#dataTable tfoot').innerHTML =
+    '<tr><td>總計</td><td>' + fmt(total) + '</td><td>100.00%</td></tr>';
+
+  // ===== 摺疊區塊 =====
+  var blocks = document.querySelectorAll('details');
+  document.getElementById('openAll').onclick = function () { blocks.forEach(function (d) { d.open = true; }); };
+  document.getElementById('closeAll').onclick = function () { blocks.forEach(function (d) { d.open = false; }); };
+
+  // ===== 圖表 =====
+  var showLabels = true, donut = false, chart = null;
+  var box = document.getElementById('container');
+
+  // 備援：Highcharts 載入失敗時，改用內建 SVG 圓餅圖（同樣可互動）
+  var hidden = {}, sel = {};
+  box.style.position = 'relative';
+
+  function tipShow(d, vt, clientX, clientY) {
+    var tip = box.querySelector('.tip'), rect = box.getBoundingClientRect();
+    tip.innerHTML = '<b>' + d.name + '</b><br>' + fmt(d.y) + ' 人次<br>占比 ' + (d.y / vt * 100).toFixed(2) + '%';
+    tip.style.display = 'block';
+    var x = clientX - rect.left + 14, y = clientY - rect.top + 14;
+    if (x + 150 > rect.width) x = clientX - rect.left - 150;
+    tip.style.left = x + 'px'; tip.style.top = y + 'px';
+  }
+
+  function svgPie() {
+    var vis = raw.filter(function (d) { return !hidden[d.name]; });
+    var vt = vis.reduce(function (t, d) { return t + d.y; }, 0);
+    var W = 640, cx = W / 2, cy = 195, R = 140, r = donut ? 78 : 0, a0 = -Math.PI / 2, out = '';
+    vis.forEach(function (d) {
+      var frac = Math.min(d.y / vt, 0.99999), a1 = a0 + frac * 2 * Math.PI, am = (a0 + a1) / 2;
+      var ox = sel[d.name] ? 12 * Math.cos(am) : 0, oy = sel[d.name] ? 12 * Math.sin(am) : 0;
+      var large = (a1 - a0) > Math.PI ? 1 : 0;
+      var x0 = cx + R * Math.cos(a0), y0 = cy + R * Math.sin(a0), x1 = cx + R * Math.cos(a1), y1 = cy + R * Math.sin(a1);
+      var path = r
+        ? 'M' + x0 + ' ' + y0 + 'A' + R + ' ' + R + ' 0 ' + large + ' 1 ' + x1 + ' ' + y1 +
+          'L' + (cx + r * Math.cos(a1)) + ' ' + (cy + r * Math.sin(a1)) +
+          'A' + r + ' ' + r + ' 0 ' + large + ' 0 ' + (cx + r * Math.cos(a0)) + ' ' + (cy + r * Math.sin(a0)) + 'Z'
+        : 'M' + cx + ' ' + cy + 'L' + x0 + ' ' + y0 + 'A' + R + ' ' + R + ' 0 ' + large + ' 1 ' + x1 + ' ' + y1 + 'Z';
+      out += '<g transform="translate(' + ox + ' ' + oy + ')"><path class="slice" data-name="' + d.name + '" d="' + path +
+        '" fill="' + d.color + '" stroke="#fff" stroke-width="2" style="cursor:pointer;transition:opacity .15s"></path>';
+      if (showLabels && frac >= 0.03) {
+        var lx = cx + (R + 18) * Math.cos(am), ly = cy + (R + 18) * Math.sin(am);
+        var anchor = Math.cos(am) >= 0 ? 'start' : 'end';
+        out += '<text x="' + lx + '" y="' + ly + '" text-anchor="' + anchor + '" font-size="14" fill="#0f172a" pointer-events="none">' +
+          '<tspan x="' + lx + '" dy="0">' + d.name + '</tspan><tspan x="' + lx + '" dy="17" fill="#475569">' +
+          (d.y / vt * 100).toFixed(1) + '%</tspan></text>';
+      }
+      out += '</g>';
+      a0 = a1;
+    });
+    var legend = raw.map(function (d) {
+      var off = hidden[d.name];
+      return '<span class="lg" role="button" tabindex="0" data-name="' + d.name + '" style="display:inline-flex;align-items:center;margin:0 12px 6px 0;font-size:.9rem;cursor:pointer;' +
+        (off ? 'opacity:.4;text-decoration:line-through' : '') + '"><span class="dot" style="background:' + d.color + '"></span>' + d.name + '</span>';
+    }).join('');
+    box.style.height = 'auto';
+    box.innerHTML =
+      '<div style="text-align:center;font-weight:700;font-size:1.05rem">2025年10月 – 2026年9月 來臺旅客按國籍分布</div>' +
+      '<div style="text-align:center;color:#475569;font-size:.9rem">總計 ' + fmt(vt) + ' 人次</div>' +
+      '<svg viewBox="0 0 ' + W + ' 380" style="width:100%;height:auto;max-height:420px" role="img" aria-label="來臺旅客按國籍圓餅圖">' + out + '</svg>' +
+      '<div style="text-align:center">' + legend + '</div>' +
+      '<div class="tip" style="display:none;position:absolute;pointer-events:none;background:rgba(15,23,42,.92);color:#fff;font-size:.85rem;line-height:1.6;padding:8px 12px;border-radius:8px;z-index:5;min-width:130px"></div>';
+
+    var byName = {};
+    raw.forEach(function (d) { byName[d.name] = d; });
+    box.querySelectorAll('.slice').forEach(function (el) {
+      var d = byName[el.getAttribute('data-name')];
+      el.addEventListener('mouseenter', function () {
+        box.querySelectorAll('.slice').forEach(function (o) { o.style.opacity = (o === el) ? '1' : '.55'; });
+      });
+      el.addEventListener('mousemove', function (e) { tipShow(d, vt, e.clientX, e.clientY); });
+      el.addEventListener('mouseleave', function () {
+        box.querySelectorAll('.slice').forEach(function (o) { o.style.opacity = '1'; });
+        box.querySelector('.tip').style.display = 'none';
+      });
+      el.addEventListener('click', function (e) {
+        var cxp = e.clientX, cyp = e.clientY;
+        sel[d.name] = !sel[d.name];
+        svgPie();
+        tipShow(d, vt, cxp, cyp);
+      });
+    });
+    box.querySelectorAll('.lg').forEach(function (el) {
+      var toggle = function () {
+        var n = el.getAttribute('data-name');
+        if (!hidden[n] && vis.length === 1) return; // 至少保留一個地區
+        hidden[n] = !hidden[n];
+        svgPie();
+      };
+      el.addEventListener('click', toggle);
+      el.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
+    });
+  }
+
+  function drawHighcharts() {
+    Highcharts.setOptions({ lang: { thousandsSep: ',', numericSymbols: null } });
+    chart = Highcharts.chart('container', {
+      chart: { type: 'pie', backgroundColor: 'transparent', style: { fontFamily: '"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif' } },
+      title: { text: '2025年10月 – 2026年9月 來臺旅客按國籍分布', style: { fontSize: '1.05rem', fontWeight: '700' } },
+      subtitle: { text: '總計 ' + fmt(total) + ' 人次' },
+      credits: { enabled: false },
+      tooltip: { pointFormat: '<b>{point.y:,.0f}</b> 人次<br>占比 <b>{point.percentage:.2f}%</b>' },
+      legend: { enabled: true, itemStyle: { fontWeight: '500' } },
+      plotOptions: {
+        pie: {
+          allowPointSelect: true, cursor: 'pointer', showInLegend: true,
+          borderColor: '#ffffff', borderWidth: 2, innerSize: '0%',
+          dataLabels: {
+            enabled: true, distance: 24,
+            format: '{point.name}<br>{point.percentage:.1f}%',
+            style: { fontSize: '0.85rem', fontWeight: '500', textOutline: 'none' },
+            connectorShape: 'crookedLine'
+          }
+        }
+      },
+      series: [{
+        name: '來臺旅客', colorByPoint: true,
+        data: raw.map(function (d, i) { return { name: d.name, y: d.y, color: d.color, sliced: i === 0, selected: i === 0 }; })
+      }],
+      responsive: {
+        rules: [{ condition: { maxWidth: 520 },
+          chartOptions: { plotOptions: { pie: { dataLabels: { distance: 8, format: '{point.percentage:.1f}%' } } } } }]
+      }
+    });
+  }
+
+  try {
+    if (typeof Highcharts === 'undefined') throw new Error('Highcharts not loaded');
+    drawHighcharts();
+  } catch (e) {
+    chart = null;
+    svgPie();
+  }
+
+  var btnL = document.getElementById('btnLabels');
+  var btnD = document.getElementById('btnDonut');
+  btnL.onclick = function () {
+    showLabels = !showLabels;
+    btnL.setAttribute('aria-pressed', showLabels);
+    if (chart) chart.series[0].update({ dataLabels: { enabled: showLabels } }); else svgPie();
+  };
+  btnD.onclick = function () {
+    donut = !donut;
+    btnD.setAttribute('aria-pressed', donut);
+    if (chart) chart.series[0].update({ innerSize: donut ? '55%' : '0%' }); else svgPie();
+  };
+})();
+</script>
+
+<script>
+(function () {
+  // ===== 資料（來源：來臺旅客按國籍統計(1).xlsx；114/10–115/9 → 2025/10–2026/9）=====
+  var months = ['2025/10','2025/11','2025/12','2026/1','2026/2','2026/3','2026/4','2026/5','2026/6','2026/7','2026/8','2026/9'];
+  var C = [
+    { n: '越南',     c: '#0d9488', v: [36493,30321,32625,31276,41074,57612,36791,35218,40182,41457,43617,38960] },
+    { n: '泰國',     c: '#f59e0b', v: [39290,35371,47858,32989,26616,45523,42640,34874,26010,28460,22656,25862] },
+    { n: '馬來西亞', c: '#8b5cf6', v: [36583,40223,49463,30989,29022,46518,33637,35372,24357,21470,23078,24521] },
+    { n: '新加坡',   c: '#ef4444', v: [33728,52015,66271,29025,18017,41605,33247,30881,27312,17962,16446,21569] },
+    { n: '菲律賓',   c: '#1d4ed8', v: [54040,57469,72038,70388,63190,81044,74225,64364,56737,51017,47420,49101] },
+    { n: '汶萊',     c: '#64748b', v: [178,341,473,137,76,287,150,161,233,107,123,119] },
+    { n: '柬埔寨',   c: '#ec4899', v: [679,1214,1038,756,608,1044,1328,1055,1112,1216,663,537] },
+    { n: '寮國',     c: '#a16207', v: [113,121,107,60,82,86,114,59,44,55,51,75] },
+    { n: '緬甸',     c: '#84cc16', v: [1536,1399,1703,1410,1495,1711,1807,1472,1504,2075,2376,2367] },
+    { n: '印度',     c: '#0ea5e9', v: [4668,5458,5216,3936,4357,6319,5086,5671,5633,4097,5171,5049] }
+  ];
+  var sum = function (a) { return a.reduce(function (t, x) { return t + x; }, 0); };
+  var fmt = function (n) { return n.toLocaleString('en-US'); };
+  C.forEach(function (d) { d.t = sum(d.v); });
+  var grand = sum(C.map(function (d) { return d.t; }));
+  var ranked = C.slice().sort(function (a, b) { return b.t - a.t; });
+  var top5 = ranked.slice(0, 5);
+
+  // ===== 月別明細表 =====
+  var th = '<tr><th>月份</th>' + C.map(function (d) { return '<th>' + d.n + '</th>'; }).join('') + '<th>小計</th></tr>';
+  document.querySelector('#monthTable thead').innerHTML = th;
+  var rows = months.map(function (m, i) {
+    var mt = sum(C.map(function (d) { return d.v[i]; }));
+    return '<tr><td>' + m + '</td>' + C.map(function (d) { return '<td>' + fmt(d.v[i]) + '</td>'; }).join('') + '<td>' + fmt(mt) + '</td></tr>';
+  }).join('');
+  rows += '<tr class="tot"><td>總計</td>' + C.map(function (d) { return '<td>' + fmt(d.t) + '</td>'; }).join('') + '<td>' + fmt(grand) + '</td></tr>';
+  document.querySelector('#monthTable tbody').innerHTML = rows;
+
+  var hasHC = (typeof Highcharts !== 'undefined');
+  if (hasHC) {
+    Highcharts.setOptions({ lang: { thousandsSep: ',', numericSymbols: null } });
+  }
+  var font = '"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif';
+
+  // ===== 長條圖 =====
+  var isLog = false, barChart = null, barBox = document.getElementById('barChart');
+
+  function barFallback() {
+    var max = ranked[0].t, minv = 100;
+    barBox.style.height = 'auto';
+    barBox.innerHTML = ranked.map(function (d) {
+      var w = isLog ? (Math.log10(d.t) - Math.log10(minv)) / (Math.log10(max) - Math.log10(minv)) * 100 : d.t / max * 100;
+      return '<div class="hbar"><span>' + d.n + '</span><div class="tr"><div class="fl" style="width:' + w.toFixed(2) +
+        '%;background:' + d.c + '"></div></div><span class="vl">' + fmt(d.t) + '</span></div>';
+    }).join('');
+  }
+  function drawBar() {
+    barChart = Highcharts.chart('barChart', {
+      chart: { type: 'bar', backgroundColor: 'transparent', style: { fontFamily: font } },
+      title: { text: '2025年10月 – 2026年9月 各國來臺旅客累計人次', style: { fontSize: '1.05rem', fontWeight: '700' } },
+      subtitle: { text: '十國合計 ' + fmt(grand) + ' 人次' },
+      credits: { enabled: false },
+      legend: { enabled: false },
+      xAxis: { categories: ranked.map(function (d) { return d.n; }), labels: { style: { fontSize: '0.9rem' } } },
+      yAxis: { title: { text: '人次' }, type: 'linear', min: 0, labels: { formatter: function () { return fmt(this.value); } } },
+      tooltip: { formatter: function () {
+        return '<b>' + this.x + '</b><br>' + fmt(this.y) + ' 人次<br>占十國合計 ' + (this.y / grand * 100).toFixed(2) + '%';
+      } },
+      plotOptions: { bar: { borderRadius: 4, pointPadding: 0.08, groupPadding: 0.05,
+        dataLabels: { enabled: true, formatter: function () { return fmt(this.y); }, style: { fontWeight: '500', textOutline: 'none' } } } },
+      series: [{ name: '累計人次', colorByPoint: true,
+        data: ranked.map(function (d) { return { y: d.t, color: d.c }; }) }]
+    });
+  }
+  try {
+    if (!hasHC) throw new Error('no highcharts');
+    drawBar();
+  } catch (e) { barChart = null; barFallback(); }
+
+  document.getElementById('btnLog').onclick = function () {
+    isLog = !isLog;
+    this.setAttribute('aria-pressed', isLog);
+    if (barChart) {
+      barChart.yAxis[0].update({ type: isLog ? 'logarithmic' : 'linear', min: isLog ? 100 : 0 });
+    } else { barFallback(); }
+  };
+
+  // ===== 折線圖（前五名）=====
+  var lineBox = document.getElementById('lineChart');
+  function lineFallback() {
+    var W = 640, H = 320, L = 52, R = 14, T = 14, B = 40, max = 90000;
+    var xs = function (i) { return L + i * (W - L - R) / 11; };
+    var ys = function (v) { return T + (1 - v / max) * (H - T - B); };
+    var g = '';
+    for (var k = 0; k <= 9; k += 3) {
+      var val = k * 10000, y = ys(val);
+      g += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + y + '" y2="' + y + '" stroke="#e2e8f0"/>' +
+        '<text x="' + (L - 6) + '" y="' + (y + 4) + '" text-anchor="end" font-size="11" fill="#64748b">' + fmt(val) + '</text>';
+    }
+    months.forEach(function (m, i) {
+      g += '<text x="' + xs(i) + '" y="' + (H - 18) + '" text-anchor="middle" font-size="10" fill="#64748b">' + m.slice(2) + '</text>';
+    });
+    top5.forEach(function (d) {
+      g += '<polyline fill="none" stroke="' + d.c + '" stroke-width="2.5" points="' +
+        d.v.map(function (v, i) { return xs(i) + ',' + ys(v); }).join(' ') + '"/>';
+      d.v.forEach(function (v, i) {
+        g += '<circle cx="' + xs(i) + '" cy="' + ys(v) + '" r="3.5" fill="' + d.c + '"><title>' + d.n + ' ' + months[i] + '：' + fmt(v) + ' 人次</title></circle>';
+      });
+    });
+    var legend = top5.map(function (d) {
+      return '<span style="display:inline-flex;align-items:center;margin:0 12px 6px 0;font-size:.9rem"><span class="dot" style="background:' + d.c + '"></span>' + d.n + '</span>';
+    }).join('');
+    lineBox.style.height = 'auto';
+    lineBox.innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;height:auto" role="img" aria-label="前五大客源國月別來臺趨勢折線圖">' + g + '</svg><div style="text-align:center">' + legend + '</div>';
+  }
+  try {
+    if (!hasHC) throw new Error('no highcharts');
+    Highcharts.chart('lineChart', {
+      chart: { type: 'line', backgroundColor: 'transparent', style: { fontFamily: font } },
+      title: { text: '前五大客源國 月別來臺人次 (2025.10 – 2026.9)', style: { fontSize: '1.05rem', fontWeight: '700' } },
+      credits: { enabled: false },
+      xAxis: { categories: months, crosshair: true },
+      yAxis: { title: { text: '人次' }, min: 0, labels: { formatter: function () { return fmt(this.value); } } },
+      tooltip: { shared: true, valueSuffix: ' 人次' },
+      legend: { enabled: true },
+      plotOptions: { line: { marker: { radius: 3.5 }, lineWidth: 2.5 } },
+      series: top5.map(function (d) { return { name: d.n, color: d.c, data: d.v }; })
+    });
+  } catch (e) { lineFallback(); }
+})();
+</script>
+</body>
+</html>
