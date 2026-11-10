@@ -205,10 +205,17 @@ footer{text-align:center; color:var(--muted); font-size:.82rem; margin-top:36px}
 <footer>來臺旅客按居住地統計數據分析・民國 114 年 10 月至 115 年 9 月（2025.10 – 2026.9）</footer>
 </div>
 
+<!-- Highcharts 主要 CDN 與備用 CDN 機制 -->
 <script src="https://code.highcharts.com/highcharts.js"></script>
-<script src="https://code.highcharts.com/modules/exporting.js"></script>
 <script>
-(function () {
+if (typeof Highcharts === 'undefined') {
+  document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/11.4.0/highcharts.js"><\/script>');
+}
+</script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+<script>
+window.addEventListener("DOMContentLoaded", function () {
   // ===== 資料（來源：來臺旅客按居住地統計.xlsx，114/10–115/9 → 2025/10–2026/9）=====
   var raw = [
     { name: '亞洲地區',   y: 7194809, color: '#1d4ed8' },
@@ -295,7 +302,7 @@ footer{text-align:center; color:var(--muted); font-size:.82rem; margin-top:36px}
     btnD.setAttribute('aria-pressed', donut);
     chart.series[0].update({ innerSize: donut ? '55%' : '0%' });
   };
-})();
+});
 </script>
 </body>
 </html>
